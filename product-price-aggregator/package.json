@@ -4,10 +4,10 @@
     "description": "A tool to aggregate product prices from multiple websites based on the consumer's country.",
     "main": "src/app.ts",
     "scripts": {
-        "start": "ts-node src/app.ts",
+        "start": "node dist/app.js",
         "build": "tsc",
         "dev": "ts-node src/app.ts",
-        "vercel-build": "tsc"
+        "vercel-build": "npm run build"
     },
     "dependencies": {
         "@google/generative-ai": "^0.24.1",
