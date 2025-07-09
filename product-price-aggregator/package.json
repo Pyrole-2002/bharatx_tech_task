@@ -2,7 +2,7 @@
     "name": "product-price-aggregator",
     "version": "1.0.0",
     "description": "A tool to aggregate product prices from multiple websites based on the consumer's country.",
-    "main": "src/app.ts",
+    "main": "dist/app.js",
     "scripts": {
         "start": "node dist/app.js",
         "build": "tsc",
