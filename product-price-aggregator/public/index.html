@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Price Aggregator</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .results { margin-top: 20px; }
+        .product { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 4px; }
+        .loading { display: none; color: #666; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>🛒 Product Price Aggregator</h1>
+    <p>AI-powered tool to compare prices across multiple e-commerce websites</p>
+    
+    <form id="searchForm">
+        <div class="form-group">
+            <label for="country">Country:</label>
+            <select id="country" required>
+                <option value="US">United States</option>
+                <option value="IN">India</option>
+                <option value="UK">United Kingdom</option>
+                <option value="CA">Canada</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="query">Product Search:</label>
+            <input type="text" id="query" placeholder="e.g., iPhone 16 Pro, 128GB" required>
+        </div>
+        
+        <button type="submit">🔍 Search Prices</button>
+    </form>
+    
+    <div class="loading" id="loading">Searching for best prices... This may take a moment.</div>
+    <div id="error" class="error"></div>
+    <div id="results" class="results"></div>
+
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const country = document.getElementById('country').value;
+            const query = document.getElementById('query').value;
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const results = document.getElementById('results');
+            
+            // Clear previous results
+            error.textContent = '';
+            results.innerHTML = '';
+            loading.style.display = 'block';
+            
+            try {
+                const response = await fetch(`/api/prices?country=${country}&query=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                loading.style.display = 'none';
+                
+                if (!response.ok) {
+                    throw new Error(data.message || data.error || 'Failed to fetch prices');
+                }
+                
+                if (data.length === 0) {
+                    results.innerHTML = '<p>No products found matching your search.</p>';
+                    return;
+                }
+                
+                results.innerHTML = `
+                    <h3>Found ${data.length} results:</h3>
+                    ${data.map((product, index) => `
+                        <div class="product">
+                            <h4>${index + 1}. ${product.productName}</h4>
+                            <p><strong>Price:</strong> ${product.price} ${product.currency}</p>
+                            <p><strong>Source:</strong> ${product.source}</p>
+                            ${product.parameters ? `<p><strong>Specs:</strong> ${product.parameters}</p>` : ''}
+                            <p><a href="${product.link}" target="_blank">View Product →</a></p>
+                        </div>
+                    `).join('')}
+                `;
+                
+            } catch (err) {
+                loading.style.display = 'none';
+                error.textContent = err.message;
+            }
+        });
+        
+        // Pre-fill with test data
+        document.getElementById('query').value = 'iPhone 16 Pro, 128GB';
+    </script>
+</body>
+</html>

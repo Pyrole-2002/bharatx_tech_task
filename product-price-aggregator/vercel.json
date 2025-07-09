@@ -1,0 +1,28 @@
+{
+    "version": 2,
+    "name": "product-price-aggregator",
+    "builds": [
+        {
+            "src": "src/app.ts",
+            "use": "@vercel/node",
+            "config": {
+                "includeFiles": ["public/**"]
+            }
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "src/app.ts"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "src/app.ts"
+        }
+    ],
+    "functions": {
+        "src/app.ts": {
+            "maxDuration": 30
+        }
+    }
+}
